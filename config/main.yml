@@ -1,0 +1,15 @@
+data:
+  data_dir: '/media/hungcv/DATA/hungvm/data_classification'
+  batch_size: 512
+  checkpoint_path: 'checkpoint/'
+
+model:
+  name: mobileone
+  pretrain_path: 'checkpoint/pretrained/best_text_classify_mobileone_s1_2806.pth'
+  num_class: 4
+
+train:
+  num_epoch: 10
+  lr: 0.001
+  threshold: 0.5
+  val_check_interval: 10
