@@ -6,13 +6,14 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import OneCycleLR
 
+
 class TextClassificationLightningModel(pl.LightningModule):
     def __init__(self, 
                  model, 
-                 config, 
-                 criterion, 
-                 learning_rate, 
-                 num_classes, 
+                 config=None, 
+                 criterion=None, 
+                 learning_rate=None, 
+                 num_classes=None, 
                  train_dataset=None, 
                  val_dataset=None):
         super(TextClassificationLightningModel, self).__init__()
@@ -70,3 +71,11 @@ class TextClassificationLightningModel(pl.LightningModule):
 
     def val_dataloader(self):
         return torch.utils.data.DataLoader(self.val_dataset, batch_size=self.config['data']['batch_size'], shuffle=False, num_workers=4)
+    
+    "evaluation phase"
+    def predict(self, inputs):
+        self.eval()  
+        with torch.no_grad(): 
+            outputs = self(inputs)
+            preds = torch.sigmoid(outputs) >= 0.5
+        return preds.float()

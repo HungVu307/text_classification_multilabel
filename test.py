@@ -5,10 +5,12 @@ import numpy as np
 from dataset import LetterBox
 from torchvision import transforms
 import torch
+from model import mobileone
 
 parser = argparse.ArgumentParser(description='Bearing Faults Project Configuration')
 parser.add_argument('--checkpoint', type=str, help='checkpoint path')
 parser.add_argument('--img', type=str, help='path of image')
+parser.add_argument('--device', default='cuda')
 args = parser.parse_args()
 
 
@@ -22,13 +24,14 @@ def main():
     image_raw = Image.open(args.img).convert('RGB')
     image_raw = np.array(image_raw)
     image_pil = Image.fromarray(image_raw)
-    image_tensor = transform(image_pil)
+    image_tensor = transform(image_pil).unsqueeze(dim=0).to(args.device)
 
     # Load model from checkpoint
-    model = TextClassificationLightningModel.load_from_checkpoint(args.checkpoint)
-    model.evel()
-    output = model(image_tensor)
-    pred = (torch.sigmoid(output) >= 0.5).float()
-
+    net = mobileone(num_classes=4, variant='s1')
+    model = TextClassificationLightningModel.load_from_checkpoint(args.checkpoint, model=net)
+    
+    "inference phase"
+    prediction = model.predict(image_tensor)
+    print(prediction)
 if __name__ == "__main__":
     main()
